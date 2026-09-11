@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import WorkView from '../../../views/WorkView.astro';
+import { works } from '../../../data/works';
+
+export function getStaticPaths() {
+  return works.map((work) => ({ params: { slug: work.slug }, props: { work } }));
+}
+
+const { work } = Astro.props;
+---
+
+<BaseLayout
+  locale="en"
+  title={`${work.titleEn} — Julia Polishchuk`}
+  description={work.descriptionEn ?? `Watercolor artwork "${work.titleEn}" by Julia Polishchuk.`}
+>
+  <WorkView locale="en" work={work} />
+</BaseLayout>

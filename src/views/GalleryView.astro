@@ -1,0 +1,73 @@
+---
+import type { Locale } from '../i18n';
+import { t } from '../i18n';
+import { works } from '../data/works';
+import ArtworkCard from '../components/ArtworkCard.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = t(locale).gallery;
+
+const series = Array.from(new Set(works.map((w) => w.series).filter((s): s is string => Boolean(s))));
+---
+
+<section class="mx-auto max-w-6xl px-5 py-14 sm:py-16">
+  <h1 class="font-display text-3xl text-ink sm:text-4xl">{copy.title}</h1>
+  <p class="mt-3 max-w-2xl text-[15px] text-ink-soft">{copy.lede}</p>
+
+  {series.length > 1 && (
+    <div id="gallery-filters" class="mt-8 flex flex-wrap gap-2">
+      <button
+        type="button"
+        data-filter=""
+        class="filter-btn rounded-full border border-teal bg-teal-tint px-4 py-1.5 font-label text-[12px] uppercase text-teal-strong"
+      >
+        {copy.filterAll}
+      </button>
+      {series.map((s) => (
+        <button
+          type="button"
+          data-filter={s}
+          class="filter-btn rounded-full border border-line px-4 py-1.5 font-label text-[12px] uppercase text-ink-soft"
+        >
+          {s}
+        </button>
+      ))}
+    </div>
+  )}
+
+  <div id="gallery-grid" class="mt-9 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
+    {works.map((work) => (
+      <div class="gallery-item" data-series={work.series ?? ''}>
+        <ArtworkCard work={work} locale={locale} />
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const items = document.querySelectorAll<HTMLElement>('.gallery-item');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter ?? '';
+
+      buttons.forEach((b) => {
+        b.classList.toggle('border-teal', b === btn);
+        b.classList.toggle('bg-teal-tint', b === btn);
+        b.classList.toggle('text-teal-strong', b === btn);
+        b.classList.toggle('border-line', b !== btn);
+        b.classList.toggle('text-ink-soft', b !== btn);
+      });
+
+      items.forEach((item) => {
+        const match = !filter || item.dataset.series === filter;
+        item.classList.toggle('hidden', !match);
+      });
+    });
+  });
+</script>

@@ -1,0 +1,87 @@
+---
+import type { Locale } from '../i18n';
+import { t } from '../i18n';
+import { contacts } from '../data/contacts';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = t(locale).contact;
+
+const channels = [
+  { name: 'Email', href: `mailto:${contacts.email}`, value: contacts.email },
+  { name: 'Instagram', href: contacts.instagram.url, value: contacts.instagram.handle },
+  { name: 'Telegram', href: contacts.telegram.url, value: contacts.telegram.handle },
+  { name: 'WhatsApp', href: contacts.whatsapp.url, value: contacts.whatsapp.phone },
+  { name: 'Viber', href: contacts.viber.url, value: contacts.viber.phone },
+];
+---
+
+<section class="mx-auto max-w-4xl px-5 py-14 sm:py-20">
+  <h1 class="font-display text-3xl text-ink sm:text-4xl">{copy.title}</h1>
+  <p class="mt-3 max-w-xl text-[15px] text-ink-soft">{copy.lede}</p>
+
+  <div class="mt-10 grid gap-12 sm:grid-cols-2">
+    <!--
+      TODO: replace access_key with Julia's real Web3Forms key
+      (https://web3forms.com — free, no backend needed) before launch.
+    -->
+    <form action="https://api.web3forms.com/submit" method="POST" class="flex flex-col gap-4">
+      <input type="hidden" name="access_key" value="TODO-web3forms-access-key" />
+      <input type="hidden" name="subject" value="New inquiry — julia-polishchuk.art" />
+
+      <label class="flex flex-col gap-1.5">
+        <span class="font-label text-[12px] uppercase tracking-wide text-ink-soft">{copy.formName}</span>
+        <input
+          type="text"
+          name="name"
+          required
+          class="rounded-md border border-line bg-surface px-3.5 py-2.5 text-[15px] text-ink outline-none focus:border-teal"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1.5">
+        <span class="font-label text-[12px] uppercase tracking-wide text-ink-soft">{copy.formContact}</span>
+        <input
+          type="text"
+          name="contact"
+          required
+          class="rounded-md border border-line bg-surface px-3.5 py-2.5 text-[15px] text-ink outline-none focus:border-teal"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1.5">
+        <span class="font-label text-[12px] uppercase tracking-wide text-ink-soft">{copy.formMessage}</span>
+        <textarea
+          name="message"
+          required
+          rows={5}
+          class="resize-y rounded-md border border-line bg-surface px-3.5 py-2.5 text-[15px] text-ink outline-none focus:border-teal"
+        ></textarea>
+      </label>
+
+      <button
+        type="submit"
+        class="mt-2 w-fit rounded-full bg-teal px-7 py-2.5 font-label text-[13px] uppercase tracking-wide text-surface hover:bg-teal-strong"
+      >
+        {copy.formSubmit}
+      </button>
+    </form>
+
+    <div>
+      <h2 class="font-display text-lg text-ink">{copy.directTitle}</h2>
+      <ul class="mt-4 flex flex-col divide-y divide-line border-y border-line">
+        {channels.map((c) => (
+          <li>
+            <a href={c.href} class="flex items-center justify-between gap-4 py-3 text-[15px] text-ink hover:text-teal-strong">
+              <span class="font-label text-[12px] uppercase tracking-wide text-ink-soft">{c.name}</span>
+              <span>{c.value}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>

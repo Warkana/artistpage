@@ -1,0 +1,82 @@
+---
+import type { Locale } from '../i18n';
+import { t, localePath } from '../i18n';
+import { relatedWorks, type Work } from '../data/works';
+import ArtworkGallery from '../components/ArtworkGallery.astro';
+import ArtworkCard from '../components/ArtworkCard.astro';
+import AskModal from '../components/AskModal.astro';
+import StatusBadge from '../components/StatusBadge.astro';
+
+interface Props {
+  locale: Locale;
+  work: Work;
+}
+
+const { locale, work } = Astro.props;
+const copy = t(locale);
+const title = locale === 'ua' ? work.titleUa : work.titleEn;
+const description = locale === 'ua' ? work.descriptionUa : work.descriptionEn;
+const related = relatedWorks(work);
+
+const meta: [string, string | undefined][] = [
+  [copy.work.year, work.year ? String(work.year) : undefined],
+  [copy.work.size, work.size],
+  [copy.work.technique, work.technique],
+  [copy.work.series, work.series],
+];
+---
+
+<section class="mx-auto max-w-6xl px-5 py-10 pb-28 lg:pb-16">
+  <a href={localePath(locale, 'gallery')} class="font-label text-[12px] uppercase tracking-wide text-ink-soft hover:text-teal-strong">
+    ← {copy.work.backToGallery}
+  </a>
+
+  <div class="mt-6 grid gap-10 lg:grid-cols-[1.3fr_1fr]">
+    <ArtworkGallery images={[work.image]} alt={title} />
+
+    <div>
+      <div class="flex flex-wrap items-center gap-3">
+        <h1 class="font-display text-3xl text-ink">{title}</h1>
+        <StatusBadge status={work.status} locale={locale} />
+      </div>
+
+      {description && <p class="mt-4 text-[15px] leading-relaxed text-ink-soft">{description}</p>}
+
+      <dl class="mt-6 divide-y divide-line border-y border-line">
+        {meta.map(([label, value]) => (
+          <div class="flex justify-between gap-4 py-2.5 text-[14px]">
+            <dt class="text-ink-soft">{label}</dt>
+            <dd class="text-right text-ink">{value ?? copy.work.unspecified}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div class="mt-7">
+        <AskModal
+          locale={locale}
+          label={copy.work.ask}
+          triggerClass="hidden lg:inline-flex rounded-full bg-teal px-7 py-2.5 font-label text-[13px] uppercase tracking-wide text-surface hover:bg-teal-strong"
+        />
+      </div>
+    </div>
+  </div>
+
+  {related.length > 0 && (
+    <div class="mt-20">
+      <h2 class="font-display text-xl text-ink">{copy.work.related}</h2>
+      <div class="mt-6 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3">
+        {related.map((w) => <ArtworkCard work={w} locale={locale} />)}
+      </div>
+    </div>
+  )}
+</section>
+
+<div class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface p-3 lg:hidden">
+  <button
+    type="button"
+    data-ask-open
+    class="w-full rounded-full bg-teal py-3 text-center font-label text-[13px] uppercase tracking-wide text-surface"
+  >
+    {copy.work.ask}
+  </button>
+</div>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://julia-polishchuk.art/sitemap-index.xml

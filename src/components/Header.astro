@@ -1,0 +1,81 @@
+---
+import type { Locale } from '../i18n';
+import { t, localePath, switchLocalePath, otherLocale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  currentPath: string;
+}
+
+const { locale, currentPath } = Astro.props;
+const nav = t(locale).nav;
+const other = otherLocale(locale);
+
+const links = [
+  { href: localePath(locale, ''), label: nav.home },
+  { href: localePath(locale, 'gallery'), label: nav.gallery },
+  { href: localePath(locale, 'about'), label: nav.about },
+  { href: localePath(locale, 'contact'), label: nav.contact },
+];
+---
+
+<header class="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
+    <a href={localePath(locale, '')} class="font-display text-lg tracking-tight text-ink">
+      {t(locale).siteName}
+    </a>
+
+    <nav class="hidden items-center gap-8 lg:flex" aria-label="Primary">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class={`font-label text-[13px] uppercase tracking-wide transition-colors hover:text-teal-strong ${
+            currentPath === link.href ? 'text-teal-strong' : 'text-ink-soft'
+          }`}
+        >
+          {link.label}
+        </a>
+      ))}
+      <a
+        href={switchLocalePath(currentPath, other)}
+        class="rounded-full border border-line px-3 py-1 font-label text-[12px] uppercase text-ink-soft hover:border-teal hover:text-teal-strong"
+      >
+        {other.toUpperCase()}
+      </a>
+    </nav>
+
+    <label
+      for="nav-toggle"
+      class="flex h-9 w-9 cursor-pointer flex-col items-center justify-center gap-1.5 lg:hidden"
+      aria-label="Menu"
+    >
+      <span class="h-px w-6 bg-ink"></span>
+      <span class="h-px w-6 bg-ink"></span>
+      <span class="h-px w-6 bg-ink"></span>
+    </label>
+  </div>
+
+  <input type="checkbox" id="nav-toggle" class="peer hidden" />
+
+  <nav
+    aria-label="Primary mobile"
+    class="hidden flex-col gap-1 border-t border-line bg-paper px-5 pb-5 pt-2 peer-checked:flex lg:hidden"
+  >
+    {links.map((link) => (
+      <a
+        href={link.href}
+        class={`rounded-md px-2 py-2.5 font-label text-[13px] uppercase tracking-wide ${
+          currentPath === link.href ? 'text-teal-strong' : 'text-ink-soft'
+        }`}
+      >
+        {link.label}
+      </a>
+    ))}
+    <a
+      href={switchLocalePath(currentPath, other)}
+      class="mt-1 w-fit rounded-full border border-line px-3 py-1 font-label text-[12px] uppercase text-ink-soft"
+    >
+      {other.toUpperCase()}
+    </a>
+  </nav>
+</header>

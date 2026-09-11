@@ -1,0 +1,117 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import type { Locale } from '../i18n';
+import { switchLocalePath, otherLocale, t } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  ogImage?: string;
+}
+
+const { locale, title, description, ogImage } = Astro.props;
+const currentPath = Astro.url.pathname;
+const canonicalURL = new URL(currentPath, Astro.site);
+const alternateURL = new URL(switchLocalePath(currentPath, otherLocale(locale)), Astro.site);
+const cookieCopy = t(locale).cookie;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" hreflang={locale} href={canonicalURL} />
+    <link rel="alternate" hreflang={otherLocale(locale)} href={alternateURL} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!--
+      TODO: analytics before launch.
+      Both snippets are intentionally commented out — do not fire tracking
+      at placeholder IDs. Uncomment and fill in the real IDs once Julia's
+      ad accounts (Google Ads / Meta) are ready, and only after the cookie
+      banner below has real accept/decline wiring.
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXX');
+      </script>
+
+      <script>
+        !function(f,b,e,v,n,t,s){...}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', 'XXXXXXXXXXXXXXX');
+        fbq('track', 'PageView');
+      </script>
+    -->
+  </head>
+  <body>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-surface focus:px-3 focus:py-2">
+      Skip to content
+    </a>
+
+    <Header locale={locale} currentPath={currentPath} />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer locale={locale} />
+
+    <div
+      id="cookie-banner"
+      class="fixed inset-x-0 bottom-0 z-50 hidden border-t border-line bg-surface px-5 py-4 shadow-[0_-8px_24px_-12px_rgba(20,30,30,.18)]"
+    >
+      <div class="mx-auto flex max-w-6xl flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm text-ink-soft">{cookieCopy.text}</p>
+        <div class="flex gap-2">
+          <button id="cookie-decline" type="button" class="rounded-full border border-line px-4 py-1.5 font-label text-[12px] uppercase text-ink-soft">
+            {cookieCopy.decline}
+          </button>
+          <button id="cookie-accept" type="button" class="rounded-full bg-teal px-4 py-1.5 font-label text-[12px] uppercase text-surface">
+            {cookieCopy.accept}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const KEY = 'cookie-consent';
+      const banner = document.getElementById('cookie-banner');
+      const stored = localStorage.getItem(KEY);
+
+      if (!stored && banner) {
+        banner.classList.remove('hidden');
+      }
+
+      document.getElementById('cookie-accept')?.addEventListener('click', () => {
+        localStorage.setItem(KEY, 'accepted');
+        banner?.classList.add('hidden');
+        // TODO: once analytics is wired up above, this is where consent
+        // should actually enable GA4 / Meta Pixel loading.
+      });
+
+      document.getElementById('cookie-decline')?.addEventListener('click', () => {
+        localStorage.setItem(KEY, 'declined');
+        banner?.classList.add('hidden');
+      });
+    </script>
+  </body>
+</html>

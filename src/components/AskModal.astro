@@ -1,0 +1,67 @@
+---
+import type { Locale } from '../i18n';
+import { t } from '../i18n';
+import { contacts } from '../data/contacts';
+
+interface Props {
+  locale: Locale;
+  label: string;
+  triggerClass?: string;
+}
+
+const { locale, label, triggerClass = '' } = Astro.props;
+const m = t(locale).askModal;
+
+const channels = [
+  { name: 'Email', href: `mailto:${contacts.email}` },
+  { name: 'Instagram', href: contacts.instagram.url },
+  { name: 'Telegram', href: contacts.telegram.url },
+  { name: 'WhatsApp', href: contacts.whatsapp.url },
+  { name: 'Viber', href: contacts.viber.url },
+];
+---
+
+<button type="button" data-ask-open class={triggerClass}>{label}</button>
+
+<dialog id="ask-modal" class="m-auto w-[92vw] max-w-sm rounded-lg border border-line bg-surface p-0 backdrop:bg-ink/40">
+  <div class="p-6">
+    <div class="flex items-start justify-between gap-4">
+      <h3 class="font-display text-xl text-ink">{m.title}</h3>
+      <button
+        type="button"
+        data-ask-close
+        aria-label={m.close}
+        class="font-label text-lg leading-none text-ink-soft hover:text-ink"
+      >
+        &times;
+      </button>
+    </div>
+    <p class="mt-2 text-sm text-ink-soft">{m.text}</p>
+    <div class="mt-5 flex flex-col gap-2">
+      {channels.map((c) => (
+        <a
+          href={c.href}
+          target={c.name === 'Email' ? undefined : '_blank'}
+          rel={c.name === 'Email' ? undefined : 'noopener noreferrer'}
+          class="rounded-md border border-line px-4 py-2.5 text-center font-label text-[13px] uppercase tracking-wide text-ink hover:border-teal hover:text-teal-strong"
+        >
+          {c.name}
+        </a>
+      ))}
+    </div>
+  </div>
+</dialog>
+
+<script>
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    const dialog = document.getElementById('ask-modal') as HTMLDialogElement | null;
+    if (!dialog) return;
+
+    if (target.closest('[data-ask-open]')) {
+      dialog.showModal();
+    } else if (target.closest('[data-ask-close]') || target === dialog) {
+      dialog.close();
+    }
+  });
+</script>

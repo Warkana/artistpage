@@ -1,0 +1,30 @@
+---
+import type { Locale } from '../i18n';
+import { t, localePath } from '../i18n';
+import { contacts } from '../data/contacts';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const f = t(locale).footer;
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-line">
+  <div class="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 sm:flex-row sm:items-center sm:justify-between">
+    <a href={localePath(locale, '')} class="font-display text-base text-ink">
+      {t(locale).siteName}
+    </a>
+
+    <nav class="flex items-center gap-5 font-label text-[12px] uppercase tracking-wide text-ink-soft" aria-label="Social">
+      <a href={contacts.instagram.url} class="hover:text-teal-strong">{f.followInstagram}</a>
+      <a href={`mailto:${contacts.email}`} class="hover:text-teal-strong">Email</a>
+    </nav>
+
+    <p class="font-label text-[12px] text-ink-soft">
+      © {year} {t(locale).siteName}. {f.rights}
+    </p>
+  </div>
+</footer>
