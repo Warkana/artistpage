@@ -22,3 +22,10 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# editor-specific settings
+.vscode/
+
+# raw source photos — already copied into src/assets/works/ for the build
+/works/
+
