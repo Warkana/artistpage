@@ -4,8 +4,8 @@
 export const contacts = {
   email: 'hello@TODO-domain.art',
   instagram: {
-    handle: '@TODO_instagram',
-    url: 'https://instagram.com/TODO_instagram',
+    handle: '@juliia__polishchuk',
+    url: 'https://www.instagram.com/juliia__polishchuk/',
   },
   telegram: {
     handle: '@TODO_telegram',
