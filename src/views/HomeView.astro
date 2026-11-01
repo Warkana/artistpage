@@ -4,6 +4,7 @@ import type { Locale } from '../i18n';
 import { t, localePath } from '../i18n';
 import { works } from '../data/works';
 import ArtworkCard from '../components/ArtworkCard.astro';
+import headerImage from '../assets/works/header.png';
 
 interface Props {
   locale: Locale;
@@ -19,7 +20,7 @@ const featuredTitle = locale === 'ua' ? featured.titleUa : featured.titleEn;
 <section class="relative">
   <div class="relative h-[78vh] min-h-[480px] max-h-[820px] w-full overflow-hidden bg-ink">
     <Image
-      src={featured.image}
+      src={headerImage}
       alt={featuredTitle}
       widths={[640, 1024, 1600, 2000]}
       sizes="100vw"
